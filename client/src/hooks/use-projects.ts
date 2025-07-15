@@ -114,13 +114,6 @@ export function useIncrementCounter() {
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
-      if (result.triggeredCounters.length > 0) {
-        toast({
-          title: `Linked counters updated!`,
-          description: `${result.triggeredCounters.map(c => c.name).join(", ")} incremented`,
-          variant: "default",
-        });
-      }
     },
     onError: () => {
       toast({
@@ -142,13 +135,6 @@ export function useDecrementCounter() {
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
-      if (result.triggeredCounters.length > 0) {
-        toast({
-          title: `Linked counters updated!`,
-          description: `${result.triggeredCounters.map(c => c.name).join(", ")} decremented`,
-          variant: "default",
-        });
-      }
     },
     onError: () => {
       toast({
