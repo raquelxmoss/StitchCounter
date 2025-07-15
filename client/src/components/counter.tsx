@@ -82,10 +82,12 @@ export function Counter({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={onReset}>
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Reset
-              </DropdownMenuItem>
+              {!isManuallyDisabled && (
+                <DropdownMenuItem onClick={onReset}>
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  Reset
+                </DropdownMenuItem>
+              )}
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
@@ -164,17 +166,19 @@ export function Counter({
         </Button>
       </div>
 
-      <div className="mt-3 flex justify-center">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-xs text-slate-500 hover:text-slate-700 h-auto p-1"
-          onClick={onReset}
-        >
-          <RotateCcw className="h-3 w-3 mr-1" />
-          Reset to {counter.min}
-        </Button>
-      </div>
+      {!isManuallyDisabled && (
+        <div className="mt-3 flex justify-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-xs text-slate-500 hover:text-slate-700 h-auto p-1"
+            onClick={onReset}
+          >
+            <RotateCcw className="h-3 w-3 mr-1" />
+            Reset to {counter.min}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

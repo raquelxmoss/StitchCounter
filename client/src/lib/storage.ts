@@ -110,7 +110,16 @@ export class LocalStorage {
     if (project) {
       const counter = project.counters.find(c => c.id === counterId);
       if (counter) {
+        // Reset the main counter
         counter.value = counter.min;
+        
+        // Reset all child counters that are linked to this counter
+        project.counters.forEach(childCounter => {
+          if (childCounter.linkedToCounterId === counterId) {
+            childCounter.value = childCounter.min;
+          }
+        });
+        
         this.saveProjects(projects);
       }
     }
