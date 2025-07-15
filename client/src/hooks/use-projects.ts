@@ -1,0 +1,218 @@
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Project, Counter, InsertProject } from "@shared/schema";
+import { LocalStorage } from "@/lib/storage";
+import { useToast } from "@/hooks/use-toast";
+
+export function useProjects() {
+  return useQuery({
+    queryKey: ["projects"],
+    queryFn: () => LocalStorage.getProjects(),
+    staleTime: 0,
+    refetchOnWindowFocus: false,
+  });
+}
+
+export function useAddProject() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: (data: InsertProject) => {
+      const project: Project = {
+        ...data,
+        id: crypto.randomUUID(),
+        createdAt: new Date(),
+        counters: [],
+      };
+      LocalStorage.addProject(project);
+      return Promise.resolve(project);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      toast({
+        title: "Project created successfully!",
+        variant: "default",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Failed to create project",
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+export function useUpdateProject() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: ({ projectId, updates }: { projectId: string; updates: Partial<Project> }) => {
+      LocalStorage.updateProject(projectId, updates);
+      return Promise.resolve();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+    onError: () => {
+      toast({
+        title: "Failed to update project",
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+export function useDeleteProject() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: (projectId: string) => {
+      LocalStorage.deleteProject(projectId);
+      return Promise.resolve();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      toast({
+        title: "Project deleted successfully!",
+        variant: "default",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Failed to delete project",
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+export function useIncrementCounter() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: ({ projectId, counterId }: { projectId: string; counterId: string }) => {
+      const result = LocalStorage.incrementCounter(projectId, counterId);
+      return Promise.resolve(result);
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      if (result.triggeredCounters.length > 0) {
+        toast({
+          title: `Linked counters updated!`,
+          description: `${result.triggeredCounters.map(c => c.name).join(", ")} incremented`,
+          variant: "default",
+        });
+      }
+    },
+    onError: () => {
+      toast({
+        title: "Failed to update counter",
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+export function useDecrementCounter() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: ({ projectId, counterId }: { projectId: string; counterId: string }) => {
+      LocalStorage.decrementCounter(projectId, counterId);
+      return Promise.resolve();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+    onError: () => {
+      toast({
+        title: "Failed to update counter",
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+export function useResetCounter() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: ({ projectId, counterId }: { projectId: string; counterId: string }) => {
+      LocalStorage.resetCounter(projectId, counterId);
+      return Promise.resolve();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      toast({
+        title: "Counter reset successfully!",
+        variant: "default",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Failed to reset counter",
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+export function useAddCounter() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: ({ projectId, counter }: { projectId: string; counter: Omit<Counter, "id"> }) => {
+      const newCounter: Counter = {
+        ...counter,
+        id: crypto.randomUUID(),
+      };
+      LocalStorage.addCounter(projectId, newCounter);
+      return Promise.resolve();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      toast({
+        title: "Counter added successfully!",
+        variant: "default",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Failed to add counter",
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+export function useDeleteCounter() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: ({ projectId, counterId }: { projectId: string; counterId: string }) => {
+      LocalStorage.deleteCounter(projectId, counterId);
+      return Promise.resolve();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      toast({
+        title: "Counter deleted successfully!",
+        variant: "default",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Failed to delete counter",
+        variant: "destructive",
+      });
+    },
+  });
+}
