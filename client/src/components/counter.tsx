@@ -39,6 +39,25 @@ export function Counter({
     return `+${counter.step} per tap`;
   };
 
+  const formatRange = () => {
+    const min = counter.min;
+    const max = counter.max;
+    
+    // For very large max values, show a cleaner format
+    if (max >= 999999) {
+      return min === 0 ? "0+" : `${min}+`;
+    }
+    if (max >= 1000) {
+      return `${min}-${Math.round(max / 1000)}k`;
+    }
+    return `${min}-${max}`;
+  };
+
+  const shouldShowRange = () => {
+    // Only show range if max is not the default value (999999) or min is not 0
+    return counter.max < 999999 || counter.min !== 0;
+  };
+
   const isAtMax = counter.value >= counter.max;
   const isAtMin = counter.value <= counter.min;
   const isManuallyDisabled = counter.isManuallyDisabled;
@@ -69,12 +88,14 @@ export function Counter({
               Auto-only
             </span>
           )}
-          <span className={cn(
-            "text-xs px-2 py-1 rounded-full",
-            isAtMax ? "text-red-700 bg-red-100" : "text-slate-500 bg-slate-100"
-          )}>
-            {counter.min}-{counter.max}
-          </span>
+          {shouldShowRange() && (
+            <span className={cn(
+              "text-xs px-2 py-1 rounded-full",
+              isAtMax ? "text-red-700 bg-red-100" : "text-slate-500 bg-slate-100"
+            )}>
+              {formatRange()}
+            </span>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
@@ -166,7 +187,7 @@ export function Counter({
         </Button>
       </div>
 
-      {!isManuallyDisabled && (
+      {!isManuallyDisabled ? (
         <div className="mt-3 flex justify-center">
           <Button
             variant="ghost"
@@ -178,6 +199,8 @@ export function Counter({
             Reset to {counter.min}
           </Button>
         </div>
+      ) : (
+        <div className="mt-3 h-8"></div>
       )}
     </div>
   );
