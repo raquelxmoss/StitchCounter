@@ -2,7 +2,7 @@ import { Counter as CounterType } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Minus, Plus, RotateCcw, MoreVertical, Link, Trash2 } from "lucide-react";
+import { Minus, Plus, RotateCcw, MoreVertical, Link, Trash2, Edit } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CounterProps {
@@ -13,6 +13,7 @@ interface CounterProps {
   onIncrement: () => void;
   onDecrement: () => void;
   onReset: () => void;
+  onEdit: () => void;
   onDelete: () => void;
 }
 
@@ -24,6 +25,7 @@ export function Counter({
   onIncrement,
   onDecrement,
   onReset,
+  onEdit,
   onDelete,
 }: CounterProps) {
   const getLinkedDescription = () => {
@@ -103,6 +105,10 @@ export function Counter({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={onEdit}>
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </DropdownMenuItem>
               {!isManuallyDisabled && (
                 <DropdownMenuItem onClick={onReset}>
                   <RotateCcw className="h-4 w-4 mr-2" />

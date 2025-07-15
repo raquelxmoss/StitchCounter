@@ -199,6 +199,31 @@ export function useAddCounter() {
   });
 }
 
+export function useUpdateCounter() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: ({ projectId, counterId, updates }: { projectId: string; counterId: string; updates: Partial<Counter> }) => {
+      LocalStorage.updateCounter(projectId, counterId, updates);
+      return Promise.resolve();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      toast({
+        title: "Counter updated successfully!",
+        variant: "default",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Failed to update counter",
+        variant: "destructive",
+      });
+    },
+  });
+}
+
 export function useDeleteCounter() {
   const queryClient = useQueryClient();
   const { toast } = useToast();

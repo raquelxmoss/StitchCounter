@@ -6,6 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { ChevronDown, ChevronUp, Edit2, MoreVertical, Plus, Trash2 } from "lucide-react";
 import { Counter } from "./counter";
 import { AddCounterModal } from "./add-counter-modal";
+import { EditCounterModal } from "./edit-counter-modal";
 import { useState } from "react";
 import { 
   useUpdateProject, 
@@ -23,6 +24,8 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project, onAddCounter }: ProjectCardProps) {
   const [showAddCounter, setShowAddCounter] = useState(false);
+  const [showEditCounter, setShowEditCounter] = useState(false);
+  const [editingCounter, setEditingCounter] = useState<typeof project.counters[0] | null>(null);
   const updateProject = useUpdateProject();
   const deleteProject = useDeleteProject();
   const incrementCounter = useIncrementCounter();
@@ -62,6 +65,11 @@ export function ProjectCard({ project, onAddCounter }: ProjectCardProps) {
 
   const handleDeleteCounter = (counterId: string) => {
     deleteCounter.mutate({ projectId: project.id, counterId });
+  };
+
+  const handleEditCounter = (counter: typeof project.counters[0]) => {
+    setEditingCounter(counter);
+    setShowEditCounter(true);
   };
 
   const getLinkedCounters = (counterId: string) => {
@@ -156,6 +164,7 @@ export function ProjectCard({ project, onAddCounter }: ProjectCardProps) {
                   onIncrement={() => handleIncrementCounter(counter.id)}
                   onDecrement={() => handleDecrementCounter(counter.id)}
                   onReset={() => handleResetCounter(counter.id)}
+                  onEdit={() => handleEditCounter(counter)}
                   onDelete={() => handleDeleteCounter(counter.id)}
                 />
               ))}
@@ -178,6 +187,14 @@ export function ProjectCard({ project, onAddCounter }: ProjectCardProps) {
         existingCounters={project.counters}
         open={showAddCounter}
         onOpenChange={setShowAddCounter}
+      />
+
+      <EditCounterModal
+        projectId={project.id}
+        counter={editingCounter}
+        existingCounters={project.counters}
+        open={showEditCounter}
+        onOpenChange={setShowEditCounter}
       />
     </>
   );
