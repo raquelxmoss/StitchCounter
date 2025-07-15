@@ -18,23 +18,37 @@ export function useAddProject() {
 
   return useMutation({
     mutationFn: (data: InsertProject) => {
-      const project: Project = {
-        ...data,
-        id: crypto.randomUUID(),
-        createdAt: new Date(),
-        counters: [],
-      };
-      LocalStorage.addProject(project);
-      return Promise.resolve(project);
+      try {
+        console.log("useAddProject: Starting project creation with data:", data);
+        
+        const project: Project = {
+          ...data,
+          id: crypto?.randomUUID?.() || `project-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          createdAt: new Date(),
+          counters: [],
+        };
+        
+        console.log("useAddProject: Created project object:", project);
+        
+        LocalStorage.addProject(project);
+        console.log("useAddProject: Successfully added project to localStorage");
+        
+        return Promise.resolve(project);
+      } catch (error) {
+        console.error("useAddProject: Error in mutationFn:", error);
+        throw error;
+      }
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("useAddProject: onSuccess called with data:", data);
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       toast({
         title: "Project created successfully!",
         variant: "default",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("useAddProject: onError called with error:", error);
       toast({
         title: "Failed to create project",
         variant: "destructive",
@@ -171,7 +185,7 @@ export function useAddCounter() {
     mutationFn: ({ projectId, counter }: { projectId: string; counter: Omit<Counter, "id"> }) => {
       const newCounter: Counter = {
         ...counter,
-        id: crypto.randomUUID(),
+        id: crypto?.randomUUID?.() || `counter-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       };
       LocalStorage.addCounter(projectId, newCounter);
       return Promise.resolve();

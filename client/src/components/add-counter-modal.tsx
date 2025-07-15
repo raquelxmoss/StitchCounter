@@ -12,11 +12,28 @@ import { z } from "zod";
 import { useState } from "react";
 import * as React from "react";
 
+const DEFAULT_VALUES = {
+  MIN: 0,
+  MAX: 999999,
+  STEP: 1,
+} as const;
+
 const formSchema = insertCounterSchema.extend({
   hasLink: z.boolean().default(false),
 });
 
 type FormData = z.infer<typeof formSchema>;
+
+const createNumberFieldHandlers = (defaultValue: number | undefined) => ({
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    return value === '' ? '' : parseInt(value) || defaultValue;
+  },
+  onBlur: (e: React.FocusEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    return value === '' ? defaultValue : parseInt(value) || defaultValue;
+  },
+});
 
 interface AddCounterModalProps {
   projectId: string;
@@ -34,9 +51,9 @@ export function AddCounterModal({ projectId, existingCounters, open, onOpenChang
     defaultValues: {
       name: "",
       value: 0,
-      min: 0,
-      max: 100,
-      step: 1,
+      min: DEFAULT_VALUES.MIN,
+      max: DEFAULT_VALUES.MAX,
+      step: DEFAULT_VALUES.STEP,
       hasLink: false,
       linkedToCounterId: undefined,
       triggerValue: undefined,
@@ -100,54 +117,66 @@ export function AddCounterModal({ projectId, existingCounters, open, onOpenChang
               <FormField
                 control={form.control}
                 name="min"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Min</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        {...field} 
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  const handlers = createNumberFieldHandlers(DEFAULT_VALUES.MIN);
+                  return (
+                    <FormItem>
+                      <FormLabel>Min</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          {...field} 
+                          onChange={(e) => field.onChange(handlers.onChange(e))}
+                          onBlur={(e) => field.onChange(handlers.onBlur(e))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
               <FormField
                 control={form.control}
                 name="max"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Max</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        {...field} 
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 100)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  const handlers = createNumberFieldHandlers(DEFAULT_VALUES.MAX);
+                  return (
+                    <FormItem>
+                      <FormLabel>Max</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          {...field} 
+                          onChange={(e) => field.onChange(handlers.onChange(e))}
+                          onBlur={(e) => field.onChange(handlers.onBlur(e))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
               <FormField
                 control={form.control}
                 name="step"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Step</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        min="1"
-                        {...field} 
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  const handlers = createNumberFieldHandlers(DEFAULT_VALUES.STEP);
+                  return (
+                    <FormItem>
+                      <FormLabel>Step</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          min="1"
+                          {...field} 
+                          onChange={(e) => field.onChange(handlers.onChange(e))}
+                          onBlur={(e) => field.onChange(handlers.onBlur(e))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
             </div>
 
@@ -218,7 +247,14 @@ export function AddCounterModal({ projectId, existingCounters, open, onOpenChang
                           min="1"
                           placeholder="e.g., 10"
                           {...field} 
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
+                          onChange={(e) => {
+                            const handlers = createNumberFieldHandlers(undefined);
+                            field.onChange(handlers.onChange(e));
+                          }}
+                          onBlur={(e) => {
+                            const handlers = createNumberFieldHandlers(undefined);
+                            field.onChange(handlers.onBlur(e));
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
