@@ -137,11 +137,18 @@ export function useDecrementCounter() {
 
   return useMutation({
     mutationFn: ({ projectId, counterId }: { projectId: string; counterId: string }) => {
-      LocalStorage.decrementCounter(projectId, counterId);
-      return Promise.resolve();
+      const result = LocalStorage.decrementCounter(projectId, counterId);
+      return Promise.resolve(result);
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
+      if (result.triggeredCounters.length > 0) {
+        toast({
+          title: `Linked counters updated!`,
+          description: `${result.triggeredCounters.map(c => c.name).join(", ")} decremented`,
+          variant: "default",
+        });
+      }
     },
     onError: () => {
       toast({

@@ -92,16 +92,39 @@ export class LocalStorage {
     return { project: project!, triggeredCounters };
   }
 
-  static decrementCounter(projectId: string, counterId: string): void {
+  static decrementCounter(projectId: string, counterId: string): { project: Project; triggeredCounters: Counter[] } {
     const projects = this.getProjects();
     const project = projects.find(p => p.id === projectId);
+    const triggeredCounters: Counter[] = [];
+    
     if (project) {
       const counter = project.counters.find(c => c.id === counterId);
       if (counter) {
-        counter.value = Math.max(counter.value - counter.step, counter.min);
+        const oldValue = counter.value;
+        const newValue = Math.max(counter.value - counter.step, counter.min);
+        counter.value = newValue;
+        
+        // Check for linked counters - decrement them when parent goes below trigger threshold
+        project.counters.forEach(linkedCounter => {
+          if (linkedCounter.linkedToCounterId === counterId && linkedCounter.triggerValue) {
+            // Check if we crossed a trigger boundary going down
+            const oldTriggerCount = Math.floor(oldValue / linkedCounter.triggerValue);
+            const newTriggerCount = Math.floor(newValue / linkedCounter.triggerValue);
+            
+            if (newTriggerCount < oldTriggerCount) {
+              // We crossed a boundary, decrement the linked counter
+              const linkedNewValue = Math.max(linkedCounter.value - linkedCounter.step, linkedCounter.min);
+              linkedCounter.value = linkedNewValue;
+              triggeredCounters.push(linkedCounter);
+            }
+          }
+        });
+        
         this.saveProjects(projects);
       }
     }
+    
+    return { project: project!, triggeredCounters };
   }
 
   static resetCounter(projectId: string, counterId: string): void {
