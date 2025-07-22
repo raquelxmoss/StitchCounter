@@ -72,3 +72,15 @@ temp/
 *.njsproj
 *.sln
 *.sw?
+
+# React Native / Expo (for StitchCounterNative subfolder)
+*.expo/
+*.expo-shared/
+web-build/
+expo-env.d.ts
+
+# Mobile development
+*.apk
+*.aab
+*.ipa
+*.app
