@@ -5,6 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  ActionSheetIOS,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Project } from '../types/schema';
@@ -28,6 +30,47 @@ export default function ProjectCard({ project }: ProjectCardProps) {
     });
   };
 
+  const toggleActive = () => {
+    updateProject.mutate({
+      projectId: project.id,
+      updates: { isActive: !project.isActive }
+    });
+  };
+
+  const showProjectMenu = () => {
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: [
+            'Cancel',
+            `Mark as ${project.isActive ? 'Completed' : 'Active'}`,
+            'Delete Project'
+          ],
+          destructiveButtonIndex: 2,
+          cancelButtonIndex: 0,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 1) {
+            toggleActive();
+          } else if (buttonIndex === 2) {
+            handleDeleteProject();
+          }
+        }
+      );
+    } else {
+      // Android - show alert with options
+      Alert.alert(
+        'Project Options',
+        'What would you like to do?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: `Mark as ${project.isActive ? 'Completed' : 'Active'}`, onPress: toggleActive },
+          { text: 'Delete Project', style: 'destructive', onPress: handleDeleteProject },
+        ]
+      );
+    }
+  };
+
   const handleDeleteProject = () => {
     Alert.alert(
       "Delete Project",
@@ -49,32 +92,41 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   return (
     <View style={styles.card}>
       {/* Header */}
-      <TouchableOpacity style={styles.header} onPress={toggleExpanded}>
-        <View style={styles.headerLeft}>
-          <Ionicons
-            name={project.isExpanded ? "chevron-down" : "chevron-forward"}
-            size={20}
-            color="#64748B"
-          />
-          <View style={styles.projectInfo}>
-            <Text style={styles.projectName}>{project.name}</Text>
-            {project.description && (
-              <Text style={styles.projectDescription}>{project.description}</Text>
-            )}
+      <View style={styles.header}>
+        {/* First Row: Title, Status, Menu */}
+        <View style={styles.headerTop}>
+          <TouchableOpacity style={styles.expandButton} onPress={toggleExpanded}>
+            <Ionicons
+              name={project.isExpanded ? "chevron-down" : "chevron-forward"}
+              size={20}
+              color="#64748B"
+            />
+          </TouchableOpacity>
+          <View style={[styles.statusIndicator, project.isActive ? styles.statusActive : styles.statusCompleted]} />
+          <Text style={styles.projectName}>{project.name}</Text>
+          <View style={[styles.statusBadge, project.isActive ? styles.statusBadgeActive : styles.statusBadgeCompleted]}>
+            <Text style={[styles.statusBadgeText, project.isActive ? styles.statusBadgeTextActive : styles.statusBadgeTextCompleted]}>
+              {project.isActive ? 'Active' : 'Completed'}
+            </Text>
           </View>
+          <TouchableOpacity
+            style={styles.menuButton}
+            onPress={showProjectMenu}
+          >
+            <Ionicons name="ellipsis-horizontal" size={16} color="#64748B" />
+          </TouchableOpacity>
         </View>
-        <View style={styles.headerRight}>
+        
+        {/* Second Row: Description and Counter Count */}
+        <View style={styles.headerBottom}>
+          {project.description && (
+            <Text style={styles.projectDescription}>{project.description}</Text>
+          )}
           <Text style={styles.counterCount}>
             {project.counters.length} counter{project.counters.length !== 1 ? 's' : ''}
           </Text>
-          <TouchableOpacity
-            style={styles.menuButton}
-            onPress={handleDeleteProject}
-          >
-            <Ionicons name="trash-outline" size={16} color="#EF4444" />
-          </TouchableOpacity>
         </View>
-      </TouchableOpacity>
+      </View>
 
       {/* Expanded Content */}
       {project.isExpanded && (
@@ -150,41 +202,76 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   header: {
+    padding: 16,
+  },
+  headerTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  headerBottom: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    marginLeft: 28, // Align with content after chevron and dot
   },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
+  expandButton: {
+    padding: 4,
+    marginRight: 8,
   },
-  projectInfo: {
-    marginLeft: 12,
-    flex: 1,
+  statusIndicator: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginRight: 12,
+  },
+  statusActive: {
+    backgroundColor: '#10B981',
+  },
+  statusCompleted: {
+    backgroundColor: '#94A3B8',
   },
   projectName: {
     fontSize: 16,
     fontWeight: '600',
     color: '#0F172A',
+    flex: 1,
+    marginRight: 8,
+  },
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginRight: 8,
+  },
+  statusBadgeActive: {
+    backgroundColor: '#DCFCE7',
+  },
+  statusBadgeCompleted: {
+    backgroundColor: '#F1F5F9',
+  },
+  statusBadgeText: {
+    fontSize: 10,
+    fontWeight: '500',
+  },
+  statusBadgeTextActive: {
+    color: '#166534',
+  },
+  statusBadgeTextCompleted: {
+    color: '#64748B',
   },
   projectDescription: {
     fontSize: 14,
     color: '#64748B',
-    marginTop: 2,
-  },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flex: 1,
+    marginRight: 12,
   },
   counterCount: {
     fontSize: 12,
     color: '#64748B',
-    marginRight: 8,
   },
   menuButton: {
-    padding: 4,
+    padding: 8,
   },
   content: {
     paddingHorizontal: 16,

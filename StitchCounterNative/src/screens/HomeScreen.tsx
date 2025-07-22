@@ -17,6 +17,7 @@ import AddProjectModal from '../components/AddProjectModal';
 export default function HomeScreen() {
   const { data: projects = [], isLoading } = useProjects();
   const [showAddProject, setShowAddProject] = useState(false);
+  const [showOnlyActive, setShowOnlyActive] = useState(true);
 
   if (isLoading) {
     return (
@@ -66,13 +67,28 @@ export default function HomeScreen() {
             // Projects List
             <View>
               <View style={styles.projectsHeader}>
-                <Text style={styles.projectsTitle}>Your Projects</Text>
-                <Text style={styles.projectsCount}>
-                  {projects.filter(p => p.isActive).length} active
-                </Text>
+                <Text style={styles.projectsTitle}>Projects</Text>
+                <View style={styles.filterContainer}>
+                  <TouchableOpacity 
+                    style={[styles.filterButton, showOnlyActive && styles.filterButtonActive]}
+                    onPress={() => setShowOnlyActive(true)}
+                  >
+                    <Text style={[styles.filterButtonText, showOnlyActive && styles.filterButtonTextActive]}>
+                      Active ({projects.filter(p => p.isActive).length})
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={[styles.filterButton, !showOnlyActive && styles.filterButtonActive]}
+                    onPress={() => setShowOnlyActive(false)}
+                  >
+                    <Text style={[styles.filterButtonText, !showOnlyActive && styles.filterButtonTextActive]}>
+                      All ({projects.length})
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
               {projects
-                .filter(project => project.isActive)
+                .filter(project => showOnlyActive ? project.isActive : true)
                 .map((project) => (
                   <ProjectCard
                     key={project.id}
@@ -196,19 +212,46 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   projectsHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: 'column',
     marginBottom: 16,
   },
   projectsTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: '#0F172A',
+    marginBottom: 12,
   },
-  projectsCount: {
+  filterContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#F1F5F9',
+    borderRadius: 8,
+    padding: 2,
+  },
+  filterButton: {
+    flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  filterButtonActive: {
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  filterButtonText: {
     fontSize: 14,
     color: '#64748B',
+    fontWeight: '500',
+  },
+  filterButtonTextActive: {
+    color: '#0F172A',
   },
   fab: {
     position: 'absolute',
