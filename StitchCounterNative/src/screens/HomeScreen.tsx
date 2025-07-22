@@ -22,7 +22,7 @@ export default function HomeScreen() {
   if (isLoading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6366F1" />
+        <ActivityIndicator size="large" color="#A855F7" />
         <Text style={styles.loadingText}>Loading projects...</Text>
       </SafeAreaView>
     );
@@ -34,12 +34,9 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <View style={styles.headerContent}>
           <View style={styles.titleRow}>
-            <Ionicons name="cut" size={24} color="#6366F1" />
+            <Ionicons name="heart" size={24} color="#A855F7" />
             <Text style={styles.title}>StitchCounter</Text>
           </View>
-          <TouchableOpacity style={styles.settingsButton}>
-            <Ionicons name="settings-outline" size={24} color="#64748B" />
-          </TouchableOpacity>
         </View>
       </View>
 
@@ -50,7 +47,7 @@ export default function HomeScreen() {
             // Empty State
             <View style={styles.emptyState}>
               <View style={styles.emptyIcon}>
-                <Ionicons name="cut" size={32} color="#94A3B8" />
+                <Ionicons name="heart-outline" size={32} color="#C4B5FD" />
               </View>
               <Text style={styles.emptyTitle}>No Projects Yet</Text>
               <Text style={styles.emptyDescription}>
@@ -122,11 +119,11 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FAF7FF',
   },
   loadingContainer: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FAF7FF',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -138,7 +135,7 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: 'white',
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: '#E9D5FF',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -151,8 +148,7 @@ const styles = StyleSheet.create({
   headerContent: {
     paddingHorizontal: 16,
     paddingVertical: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
   },
   titleRow: {
@@ -164,9 +160,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     color: '#0F172A',
-  },
-  settingsButton: {
-    padding: 8,
   },
   main: {
     flex: 1,
@@ -181,7 +174,7 @@ const styles = StyleSheet.create({
   emptyIcon: {
     width: 64,
     height: 64,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#F3E8FF',
     borderRadius: 32,
     justifyContent: 'center',
     alignItems: 'center',
@@ -201,7 +194,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   createButton: {
-    backgroundColor: '#6366F1',
+    backgroundColor: '#A855F7',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -223,7 +216,7 @@ const styles = StyleSheet.create({
   },
   filterContainer: {
     flexDirection: 'row',
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#F3E8FF',
     borderRadius: 8,
     padding: 2,
   },
@@ -259,7 +252,7 @@ const styles = StyleSheet.create({
     right: 24,
     width: 56,
     height: 56,
-    backgroundColor: '#6366F1',
+    backgroundColor: '#A855F7',
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',

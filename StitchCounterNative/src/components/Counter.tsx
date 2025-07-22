@@ -169,7 +169,7 @@ export default function Counter({
           <Ionicons
             name="remove"
             size={20}
-            color={(isAtMin || isManuallyDisabled) ? "#94A3B8" : "#6366F1"}
+            color={(isAtMin || isManuallyDisabled) ? "#C4B5FD" : "#A855F7"}
           />
         </TouchableOpacity>
 
@@ -239,8 +239,8 @@ const styles = StyleSheet.create({
   },
   cardLinked: {
     borderWidth: 2,
-    borderColor: '#6366F1',
-    backgroundColor: '#F8FAFC',
+    borderColor: '#A855F7',
+    backgroundColor: '#FAF7FF',
   },
   cardAtMax: {
     borderWidth: 2,
@@ -248,9 +248,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEF2F2',
   },
   cardAutoOnly: {
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#F3E8FF',
     borderWidth: 2,
-    borderColor: '#93C5FD',
+    borderColor: '#C4B5FD',
   },
   linkedIndicator: {
     position: 'absolute',
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
     right: -8,
     width: 24,
     height: 24,
-    backgroundColor: '#6366F1',
+    backgroundColor: '#A855F7',
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
@@ -284,12 +284,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,
-    backgroundColor: '#E0E7FF',
+    backgroundColor: '#F3E8FF',
   },
   badgeText: {
     fontSize: 10,
     fontWeight: '500',
-    color: '#6366F1',
+    color: '#A855F7',
   },
   autoOnlyBadge: {
     backgroundColor: '#DBEAFE',
@@ -326,12 +326,12 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   decrementButton: {
-    borderColor: '#6366F1',
+    borderColor: '#A855F7',
     backgroundColor: 'white',
   },
   incrementButton: {
-    borderColor: '#6366F1',
-    backgroundColor: '#6366F1',
+    borderColor: '#A855F7',
+    backgroundColor: '#A855F7',
   },
   incrementButtonAtMax: {
     backgroundColor: '#EF4444',

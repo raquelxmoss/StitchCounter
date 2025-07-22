@@ -102,7 +102,7 @@ export default function AddProjectModal({ visible, onClose }: AddProjectModalPro
           </View>
 
           <View style={styles.infoBox}>
-            <Ionicons name="information-circle-outline" size={20} color="#6366F1" />
+            <Ionicons name="heart-outline" size={20} color="#A855F7" />
             <Text style={styles.infoText}>
               You can add counters to track different aspects of your project after creating it.
             </Text>
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     fontSize: 16,
-    color: '#6366F1',
+    color: '#A855F7',
   },
   title: {
     fontSize: 18,
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   },
   saveText: {
     fontSize: 16,
-    color: '#6366F1',
+    color: '#A855F7',
     fontWeight: '500',
   },
   saveTextDisabled: {
@@ -185,11 +185,11 @@ const styles = StyleSheet.create({
   infoBox: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#F3E8FF',
     padding: 12,
     borderRadius: 8,
     borderLeftWidth: 3,
-    borderLeftColor: '#6366F1',
+    borderLeftColor: '#A855F7',
   },
   infoText: {
     fontSize: 14,

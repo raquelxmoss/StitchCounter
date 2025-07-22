@@ -168,7 +168,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 style={styles.addCounterButton}
                 onPress={() => setShowAddCounter(true)}
               >
-                <Ionicons name="add" size={16} color="#6366F1" />
+                <Ionicons name="add" size={16} color="#A855F7" />
                 <Text style={styles.addCounterText}>Add Counter</Text>
               </TouchableOpacity>
             </View>
@@ -226,10 +226,10 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   statusActive: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#A7F3D0',
   },
   statusCompleted: {
-    backgroundColor: '#94A3B8',
+    backgroundColor: '#C4B5FD',
   },
   projectName: {
     fontSize: 16,
@@ -245,20 +245,20 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   statusBadgeActive: {
-    backgroundColor: '#DCFCE7',
+    backgroundColor: '#ECFDF5',
   },
   statusBadgeCompleted: {
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#F3E8FF',
   },
   statusBadgeText: {
     fontSize: 10,
     fontWeight: '500',
   },
   statusBadgeTextActive: {
-    color: '#166534',
+    color: '#059669',
   },
   statusBadgeTextCompleted: {
-    color: '#64748B',
+    color: '#7C3AED',
   },
   projectDescription: {
     fontSize: 14,
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   addFirstCounterButton: {
-    backgroundColor: '#6366F1',
+    backgroundColor: '#A855F7',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 6,
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
   addCounterText: {
     marginLeft: 6,
     fontSize: 14,
-    color: '#6366F1',
+    color: '#A855F7',
     fontWeight: '500',
   },
 });

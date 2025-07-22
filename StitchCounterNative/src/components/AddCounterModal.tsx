@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     fontSize: 16,
-    color: '#6366F1',
+    color: '#A855F7',
   },
   title: {
     fontSize: 18,
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
   },
   saveText: {
     fontSize: 16,
-    color: '#6366F1',
+    color: '#A855F7',
     fontWeight: '500',
   },
   saveTextDisabled: {
