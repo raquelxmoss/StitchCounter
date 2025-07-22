@@ -1,0 +1,177 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Project, Counter } from '../types/schema';
+
+const STORAGE_KEY = "stitchcounter_projects";
+
+export class AppStorage {
+  static async getProjects(): Promise<Project[]> {
+    try {
+      const data = await AsyncStorage.getItem(STORAGE_KEY);
+      if (!data) return [];
+      
+      const projects = JSON.parse(data);
+      return projects.map((p: any) => ({
+        ...p,
+        createdAt: new Date(p.createdAt),
+        isActive: p.isActive ?? true,
+        isExpanded: p.isExpanded ?? true,
+        counters: p.counters.map((c: any) => ({
+          ...c,
+          isManuallyDisabled: c.isManuallyDisabled ?? false,
+        })),
+      }));
+    } catch (error) {
+      console.error("Failed to load projects:", error);
+      return [];
+    }
+  }
+
+  static async saveProjects(projects: Project[]): Promise<void> {
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+    } catch (error) {
+      console.error("Failed to save projects:", error);
+    }
+  }
+
+  static async addProject(project: Project): Promise<void> {
+    const projects = await this.getProjects();
+    projects.push(project);
+    await this.saveProjects(projects);
+  }
+
+  static async updateProject(projectId: string, updates: Partial<Project>): Promise<void> {
+    const projects = await this.getProjects();
+    const index = projects.findIndex(p => p.id === projectId);
+    if (index !== -1) {
+      projects[index] = { ...projects[index], ...updates };
+      await this.saveProjects(projects);
+    }
+  }
+
+  static async deleteProject(projectId: string): Promise<void> {
+    const projects = await this.getProjects();
+    const filteredProjects = projects.filter(p => p.id !== projectId);
+    await this.saveProjects(filteredProjects);
+  }
+
+  static async updateCounter(projectId: string, counterId: string, updates: Partial<Counter>): Promise<void> {
+    const projects = await this.getProjects();
+    const project = projects.find(p => p.id === projectId);
+    if (project) {
+      const counter = project.counters.find(c => c.id === counterId);
+      if (counter) {
+        Object.assign(counter, updates);
+        await this.saveProjects(projects);
+      }
+    }
+  }
+
+  static async incrementCounter(projectId: string, counterId: string): Promise<{ project: Project; triggeredCounters: Counter[] }> {
+    const projects = await this.getProjects();
+    const project = projects.find(p => p.id === projectId);
+    const triggeredCounters: Counter[] = [];
+    
+    if (project) {
+      const counter = project.counters.find(c => c.id === counterId);
+      if (counter) {
+        const newValue = Math.min(counter.value + counter.step, counter.max);
+        counter.value = newValue;
+        
+        // Check for linked counters
+        project.counters.forEach(linkedCounter => {
+          if (linkedCounter.linkedToCounterId === counterId && linkedCounter.triggerValue) {
+            if (newValue % linkedCounter.triggerValue === 0 && newValue > 0) {
+              const linkedNewValue = Math.min(linkedCounter.value + linkedCounter.step, linkedCounter.max);
+              linkedCounter.value = linkedNewValue;
+              triggeredCounters.push(linkedCounter);
+            }
+          }
+        });
+        
+        await this.saveProjects(projects);
+      }
+    }
+    
+    return { project: project!, triggeredCounters };
+  }
+
+  static async decrementCounter(projectId: string, counterId: string): Promise<{ project: Project; triggeredCounters: Counter[] }> {
+    const projects = await this.getProjects();
+    const project = projects.find(p => p.id === projectId);
+    const triggeredCounters: Counter[] = [];
+    
+    if (project) {
+      const counter = project.counters.find(c => c.id === counterId);
+      if (counter) {
+        const oldValue = counter.value;
+        const newValue = Math.max(counter.value - counter.step, counter.min);
+        counter.value = newValue;
+        
+        // Check for linked counters - decrement them when parent goes below trigger threshold
+        project.counters.forEach(linkedCounter => {
+          if (linkedCounter.linkedToCounterId === counterId && linkedCounter.triggerValue) {
+            // Check if we crossed a trigger boundary going down
+            const oldTriggerCount = Math.floor(oldValue / linkedCounter.triggerValue);
+            const newTriggerCount = Math.floor(newValue / linkedCounter.triggerValue);
+            
+            if (newTriggerCount < oldTriggerCount) {
+              // We crossed a boundary, decrement the linked counter
+              const linkedNewValue = Math.max(linkedCounter.value - linkedCounter.step, linkedCounter.min);
+              linkedCounter.value = linkedNewValue;
+              triggeredCounters.push(linkedCounter);
+            }
+          }
+        });
+        
+        await this.saveProjects(projects);
+      }
+    }
+    
+    return { project: project!, triggeredCounters };
+  }
+
+  static async resetCounter(projectId: string, counterId: string): Promise<void> {
+    const projects = await this.getProjects();
+    const project = projects.find(p => p.id === projectId);
+    if (project) {
+      const counter = project.counters.find(c => c.id === counterId);
+      if (counter) {
+        // Reset the main counter
+        counter.value = counter.min;
+        
+        // Reset all child counters that are linked to this counter
+        project.counters.forEach(childCounter => {
+          if (childCounter.linkedToCounterId === counterId) {
+            childCounter.value = childCounter.min;
+          }
+        });
+        
+        await this.saveProjects(projects);
+      }
+    }
+  }
+
+  static async addCounter(projectId: string, counter: Counter): Promise<void> {
+    const projects = await this.getProjects();
+    const project = projects.find(p => p.id === projectId);
+    if (project) {
+      // Ensure the new field has a default value for existing data
+      const counterWithDefaults = {
+        ...counter,
+        isManuallyDisabled: counter.isManuallyDisabled ?? false,
+      };
+      project.counters.push(counterWithDefaults);
+      await this.saveProjects(projects);
+    }
+  }
+
+  static async deleteCounter(projectId: string, counterId: string): Promise<void> {
+    const projects = await this.getProjects();
+    const project = projects.find(p => p.id === projectId);
+    if (project) {
+      project.counters = project.counters.filter(c => c.id !== counterId);
+      await this.saveProjects(projects);
+    }
+  }
+}
