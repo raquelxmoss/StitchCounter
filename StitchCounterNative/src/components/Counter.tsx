@@ -21,6 +21,7 @@ interface CounterProps {
   projectId: string;
   isLinked: boolean;
   linkedCounters: CounterType[];
+  allCounters?: CounterType[];
 }
 
 export default function Counter({
@@ -28,6 +29,7 @@ export default function Counter({
   projectId,
   isLinked,
   linkedCounters,
+  allCounters = [],
 }: CounterProps) {
   const [showEdit, setShowEdit] = useState(false);
   const incrementCounter = useIncrementCounter();
@@ -222,6 +224,7 @@ export default function Counter({
         counter={counter}
         projectId={projectId}
         onDelete={handleDelete}
+        existingCounters={allCounters.filter(c => c.id !== counter.id)}
       />
     </View>
   );

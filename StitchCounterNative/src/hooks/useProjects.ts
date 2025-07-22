@@ -50,11 +50,9 @@ export function useAddProject() {
       console.log("useAddProject: Invalidating queries...");
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       queryClient.refetchQueries({ queryKey: ["projects"] });
-      Alert.alert("Success", "Project created successfully!");
     },
     onError: (error) => {
       console.error("useAddProject: onError called with error:", error);
-      Alert.alert("Error", "Failed to create project. Please try again.");
     },
   });
 }
@@ -70,7 +68,6 @@ export function useUpdateProject() {
     },
     onError: (error) => {
       console.error("Error updating project:", error);
-      Alert.alert("Error", "Failed to update project. Please try again.");
     },
   });
 }
@@ -82,11 +79,9 @@ export function useDeleteProject() {
     mutationFn: (projectId: string) => AppStorage.deleteProject(projectId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
-      Alert.alert("Success", "Project deleted successfully!");
     },
     onError: (error) => {
       console.error("Error deleting project:", error);
-      Alert.alert("Error", "Failed to delete project. Please try again.");
     },
   });
 }
@@ -144,11 +139,9 @@ export function useAddCounter() {
       AppStorage.addCounter(projectId, counter),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
-      Alert.alert("Success", "Counter added successfully!");
     },
     onError: (error) => {
       console.error("Error adding counter:", error);
-      Alert.alert("Error", "Failed to add counter. Please try again.");
     },
   });
 }
@@ -176,11 +169,9 @@ export function useUpdateCounter() {
       AppStorage.updateCounter(projectId, counterId, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
-      Alert.alert("Success", "Counter updated successfully!");
     },
     onError: (error) => {
       console.error("Error updating counter:", error);
-      Alert.alert("Error", "Failed to update counter. Please try again.");
     },
   });
 }

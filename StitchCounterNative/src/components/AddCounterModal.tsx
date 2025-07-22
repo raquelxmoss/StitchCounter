@@ -7,7 +7,12 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  Switch,
+  ScrollView,
+  ActionSheetIOS,
+  Platform,
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { Counter } from '../types/schema';
 import { useAddCounter } from '../hooks/useProjects';
 
@@ -28,6 +33,10 @@ export default function AddCounterModal({
   const [min, setMin] = useState('0');
   const [max, setMax] = useState('999999');
   const [step, setStep] = useState('1');
+  const [hasLink, setHasLink] = useState(false);
+  const [linkedToCounterId, setLinkedToCounterId] = useState('');
+  const [triggerValue, setTriggerValue] = useState('10');
+  const [isManuallyDisabled, setIsManuallyDisabled] = useState(false);
   const addCounter = useAddCounter();
 
   const handleSubmit = () => {
@@ -60,6 +69,17 @@ export default function AddCounterModal({
       return;
     }
 
+    const triggerVal = hasLink ? parseInt(triggerValue) : undefined;
+    if (hasLink && (isNaN(triggerVal!) || triggerVal! <= 0)) {
+      Alert.alert('Error', 'Trigger value must be a number greater than 0');
+      return;
+    }
+
+    if (hasLink && !linkedToCounterId) {
+      Alert.alert('Error', 'Please select a counter to link to');
+      return;
+    }
+
     const counter: Counter = {
       id: `counter-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       name: name.trim(),
@@ -67,7 +87,9 @@ export default function AddCounterModal({
       min: minValue,
       max: maxValue,
       step: stepValue,
-      isManuallyDisabled: false,
+      linkedToCounterId: hasLink ? linkedToCounterId : undefined,
+      triggerValue: hasLink ? triggerVal : undefined,
+      isManuallyDisabled,
     };
 
     addCounter.mutate(
@@ -78,6 +100,10 @@ export default function AddCounterModal({
           setMin('0');
           setMax('999999');
           setStep('1');
+          setHasLink(false);
+          setLinkedToCounterId('');
+          setTriggerValue('10');
+          setIsManuallyDisabled(false);
           onClose();
         },
       }
@@ -89,6 +115,10 @@ export default function AddCounterModal({
     setMin('0');
     setMax('999999');
     setStep('1');
+    setHasLink(false);
+    setLinkedToCounterId('');
+    setTriggerValue('10');
+    setIsManuallyDisabled(false);
     onClose();
   };
 
@@ -118,7 +148,7 @@ export default function AddCounterModal({
         </View>
 
         {/* Form */}
-        <View style={styles.form}>
+        <ScrollView style={styles.form} showsVerticalScrollIndicator={false}>
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Counter Name *</Text>
             <TextInput
@@ -166,7 +196,100 @@ export default function AddCounterModal({
             />
             <Text style={styles.helpText}>How much to increment/decrement by each tap</Text>
           </View>
-        </View>
+
+          {/* Counter Linking */}
+          <View style={styles.inputGroup}>
+            <View style={styles.switchRow}>
+              <Text style={[styles.label, existingCounters.length === 0 && styles.labelDisabled]}>
+                Link to another counter
+              </Text>
+              <Switch
+                value={hasLink}
+                onValueChange={setHasLink}
+                disabled={existingCounters.length === 0}
+              />
+            </View>
+            {existingCounters.length === 0 && (
+              <Text style={styles.helpText}>Create another counter first to enable linking</Text>
+            )}
+          </View>
+
+          {hasLink && existingCounters.length > 0 && (
+            <View style={styles.linkingSection}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Link to counter</Text>
+                <TouchableOpacity
+                  style={styles.pickerButton}
+                  onPress={() => {
+                    if (Platform.OS === 'ios') {
+                      const options = ['Cancel', ...existingCounters.map(c => c.name)];
+                      ActionSheetIOS.showActionSheetWithOptions(
+                        {
+                          options,
+                          cancelButtonIndex: 0,
+                        },
+                        (buttonIndex) => {
+                          if (buttonIndex > 0) {
+                            setLinkedToCounterId(existingCounters[buttonIndex - 1].id);
+                          }
+                        }
+                      );
+                    }
+                  }}
+                >
+                  <Text style={styles.pickerButtonText}>
+                    {linkedToCounterId 
+                      ? existingCounters.find(c => c.id === linkedToCounterId)?.name || 'Select counter...'
+                      : 'Select counter...'}
+                  </Text>
+                  <Text style={styles.pickerButtonArrow}>▼</Text>
+                </TouchableOpacity>
+                {Platform.OS === 'android' && (
+                  <View style={styles.pickerContainer}>
+                    <Picker
+                      selectedValue={linkedToCounterId}
+                      onValueChange={setLinkedToCounterId}
+                      style={styles.picker}
+                    >
+                      <Picker.Item label="Select counter..." value="" />
+                      {existingCounters.map((counter) => (
+                        <Picker.Item
+                          key={counter.id}
+                          label={counter.name}
+                          value={counter.id}
+                        />
+                      ))}
+                    </Picker>
+                  </View>
+                )}
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Trigger every X counts</Text>
+                <TextInput
+                  style={styles.input}
+                  value={triggerValue}
+                  onChangeText={(text) => setTriggerValue(text.replace(/[^0-9]/g, ''))}
+                  placeholder="10"
+                  keyboardType="numeric"
+                />
+                <Text style={styles.helpText}>Auto-increment this counter every X counts of the linked counter</Text>
+              </View>
+            </View>
+          )}
+
+          {/* Manual Disable */}
+          <View style={styles.inputGroup}>
+            <View style={styles.switchRow}>
+              <Text style={styles.label}>Auto-increment only</Text>
+              <Switch
+                value={isManuallyDisabled}
+                onValueChange={setIsManuallyDisabled}
+              />
+            </View>
+            <Text style={styles.helpText}>Disable manual +/- buttons (can only be incremented automatically)</Text>
+          </View>
+        </ScrollView>
       </View>
     </Modal>
   );
@@ -217,7 +340,9 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
   },
   form: {
-    padding: 16,
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
   },
   inputGroup: {
     marginBottom: 24,
@@ -249,5 +374,47 @@ const styles = StyleSheet.create({
   },
   flex1: {
     flex: 1,
+  },
+  switchRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  labelDisabled: {
+    color: '#94A3B8',
+  },
+  linkingSection: {
+    marginLeft: 16,
+    borderLeftWidth: 2,
+    borderLeftColor: '#E2E8F0',
+    paddingLeft: 16,
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 8,
+    backgroundColor: 'white',
+  },
+  picker: {
+    height: 50,
+  },
+  pickerButton: {
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 8,
+    backgroundColor: 'white',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  pickerButtonText: {
+    fontSize: 16,
+    color: '#0F172A',
+  },
+  pickerButtonArrow: {
+    fontSize: 12,
+    color: '#64748B',
   },
 });

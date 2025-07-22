@@ -106,6 +106,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                     projectId={project.id}
                     isLinked={isLinked}
                     linkedCounters={linkedCounters}
+                    allCounters={project.counters}
                   />
                 );
               })}
