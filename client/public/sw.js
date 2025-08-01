@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stitchcounter-v1.0.1';
+const CACHE_NAME = 'stitchcounter-v1.0.2';
 const urlsToCache = [
   '/',
   '/src/main.tsx',
