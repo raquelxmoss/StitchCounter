@@ -1,8 +1,6 @@
 const CACHE_NAME = 'stitchcounter-v1.0.1';
 const urlsToCache = [
   '/',
-  '/src/main.tsx',
-  '/src/index.css',
   'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'
 ];
 
