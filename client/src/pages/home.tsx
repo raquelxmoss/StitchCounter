@@ -1,4 +1,4 @@
-import { Settings, Scissors } from "lucide-react";
+import { Scissors } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProjectCard } from "@/components/project-card";
 import { AddProjectModal } from "@/components/add-project-modal";
@@ -30,9 +30,6 @@ export default function Home() {
               <Scissors className="text-primary text-xl" />
               <h1 className="text-xl font-semibold text-slate-900">StitchCounter</h1>
             </div>
-            <Button variant="ghost" size="sm" className="p-2">
-              <Settings className="text-slate-600" />
-            </Button>
           </div>
         </div>
       </header>
