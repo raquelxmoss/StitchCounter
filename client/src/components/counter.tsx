@@ -88,31 +88,36 @@ export function Counter({
         </div>
       )}
 
-      <div className="flex items-center justify-between p-4 pb-0">
-        <h3 className={cn(
-          "font-medium",
-          counter.isDone ? "text-green-700 line-through" : "text-slate-900"
-        )}>{counter.name}</h3>
-        <div className="flex items-center space-x-2">
-          {isLinked && (
-            <span className="text-xs text-accent bg-accent/10 px-2 py-1 rounded-full">
-              Linked
-            </span>
-          )}
-          {isManuallyDisabled && (
-            <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
-              Auto-only
-            </span>
-          )}
-          {shouldShowRange() && (
-            <span className={cn(
-              "text-xs px-2 py-1 rounded-full",
-              isAtMax ? "text-red-700 bg-red-100" : "text-slate-500 bg-slate-100"
-            )}>
-              {formatRange()}
-            </span>
-          )}
-          <DropdownMenu>
+      <div className="p-4 pb-0">
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex-1">
+            <h3 className={cn(
+              "font-medium",
+              counter.isDone ? "text-green-700 line-through" : "text-slate-900"
+            )}>{counter.name}</h3>
+            <div className="flex flex-wrap gap-1 mt-1">
+              {isLinked && (
+                <span className="text-xs text-accent bg-accent/10 px-2 py-0.5 rounded-full">
+                  Linked
+                </span>
+              )}
+              {isManuallyDisabled && (
+                <span className="text-xs text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">
+                  Auto-only
+                </span>
+              )}
+              {shouldShowRange() && (
+                <span className={cn(
+                  "text-xs px-2 py-0.5 rounded-full",
+                  isAtMax ? "text-red-700 bg-red-100" : "text-slate-500 bg-slate-100"
+                )}>
+                  {formatRange()}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center space-x-1 ml-2">
+            <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
                 <MoreVertical className="h-3 w-3" />
@@ -159,19 +164,20 @@ export function Counter({
                 </AlertDialogContent>
               </AlertDialog>
             </DropdownMenuContent>
-          </DropdownMenu>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-6 w-6 p-0"
-            onClick={onToggleCollapse}
-          >
-            {counter.isCollapsed ? (
-              <ChevronDown className="h-3 w-3" />
-            ) : (
-              <ChevronUp className="h-3 w-3" />
-            )}
-          </Button>
+            </DropdownMenu>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0"
+              onClick={onToggleCollapse}
+            >
+              {counter.isCollapsed ? (
+                <ChevronDown className="h-3 w-3" />
+              ) : (
+                <ChevronUp className="h-3 w-3" />
+              )}
+            </Button>
+          </div>
         </div>
       </div>
 
