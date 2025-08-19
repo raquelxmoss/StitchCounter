@@ -58,6 +58,8 @@ export function AddCounterModal({ projectId, existingCounters, open, onOpenChang
       linkedToCounterId: undefined,
       triggerValue: undefined,
       isManuallyDisabled: false,
+      isCollapsed: false,
+      isDone: false,
     },
   });
 
@@ -76,6 +78,8 @@ export function AddCounterModal({ projectId, existingCounters, open, onOpenChang
       value: counterData.min, // Start at minimum value
       linkedToCounterId: hasLink ? counterData.linkedToCounterId : undefined,
       triggerValue: hasLink ? counterData.triggerValue : undefined,
+      isCollapsed: false,
+      isDone: false,
     };
 
     addCounter.mutate(

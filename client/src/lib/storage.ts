@@ -15,6 +15,8 @@ export class LocalStorage {
         counters: p.counters.map((c: any) => ({
           ...c,
           isManuallyDisabled: c.isManuallyDisabled ?? false,
+          isCollapsed: c.isCollapsed ?? false,
+          isDone: c.isDone ?? false,
         })),
       }));
     } catch (error) {
@@ -156,6 +158,8 @@ export class LocalStorage {
       const counterWithDefaults = {
         ...counter,
         isManuallyDisabled: counter.isManuallyDisabled ?? false,
+        isCollapsed: counter.isCollapsed ?? false,
+        isDone: counter.isDone ?? false,
       };
       project.counters.push(counterWithDefaults);
       this.saveProjects(projects);

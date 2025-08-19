@@ -14,7 +14,8 @@ import {
   useIncrementCounter, 
   useDecrementCounter, 
   useResetCounter, 
-  useDeleteCounter 
+  useDeleteCounter,
+  useUpdateCounter 
 } from "@/hooks/use-projects";
 
 interface ProjectCardProps {
@@ -32,6 +33,7 @@ export function ProjectCard({ project, onAddCounter }: ProjectCardProps) {
   const decrementCounter = useDecrementCounter();
   const resetCounter = useResetCounter();
   const deleteCounter = useDeleteCounter();
+  const updateCounter = useUpdateCounter();
 
   const toggleExpanded = () => {
     updateProject.mutate({
@@ -70,6 +72,28 @@ export function ProjectCard({ project, onAddCounter }: ProjectCardProps) {
   const handleEditCounter = (counter: typeof project.counters[0]) => {
     setEditingCounter(counter);
     setShowEditCounter(true);
+  };
+
+  const handleToggleCounterCollapse = (counterId: string) => {
+    const counter = project.counters.find(c => c.id === counterId);
+    if (counter) {
+      updateCounter.mutate({
+        projectId: project.id,
+        counterId,
+        updates: { isCollapsed: !counter.isCollapsed }
+      });
+    }
+  };
+
+  const handleToggleCounterDone = (counterId: string) => {
+    const counter = project.counters.find(c => c.id === counterId);
+    if (counter) {
+      updateCounter.mutate({
+        projectId: project.id,
+        counterId,
+        updates: { isDone: !counter.isDone }
+      });
+    }
   };
 
   const getLinkedCounters = (counterId: string) => {
@@ -166,6 +190,8 @@ export function ProjectCard({ project, onAddCounter }: ProjectCardProps) {
                   onReset={() => handleResetCounter(counter.id)}
                   onEdit={() => handleEditCounter(counter)}
                   onDelete={() => handleDeleteCounter(counter.id)}
+                  onToggleCollapse={() => handleToggleCounterCollapse(counter.id)}
+                  onToggleDone={() => handleToggleCounterDone(counter.id)}
                 />
               ))}
 

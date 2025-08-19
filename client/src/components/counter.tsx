@@ -2,7 +2,7 @@ import { Counter as CounterType } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Minus, Plus, RotateCcw, MoreVertical, Link, Trash2, Edit } from "lucide-react";
+import { Minus, Plus, RotateCcw, MoreVertical, Link, Trash2, Edit, ChevronDown, ChevronUp, Check, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CounterProps {
@@ -15,6 +15,8 @@ interface CounterProps {
   onReset: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  onToggleCollapse: () => void;
+  onToggleDone: () => void;
 }
 
 export function Counter({
@@ -27,6 +29,8 @@ export function Counter({
   onReset,
   onEdit,
   onDelete,
+  onToggleCollapse,
+  onToggleDone,
 }: CounterProps) {
   const getLinkedDescription = () => {
     if (counter.linkedToCounterId && counter.triggerValue) {
@@ -66,10 +70,11 @@ export function Counter({
 
   return (
     <div className={cn(
-      "bg-slate-50 rounded-lg p-4 relative transition-all",
+      "bg-slate-50 rounded-lg relative transition-all",
       isLinked && "ring-2 ring-accent/20",
       isAtMax && "ring-2 ring-red-200 bg-red-50",
-      isManuallyDisabled && "bg-blue-50 ring-2 ring-blue-200"
+      isManuallyDisabled && "bg-blue-50 ring-2 ring-blue-200",
+      counter.isDone && "bg-green-50 ring-2 ring-green-200 opacity-75"
     )}>
       {isLinked && (
         <div className="absolute -top-2 -right-2 w-6 h-6 bg-accent rounded-full flex items-center justify-center animate-pulse">
@@ -77,8 +82,17 @@ export function Counter({
         </div>
       )}
 
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="font-medium text-slate-900">{counter.name}</h3>
+      {counter.isDone && (
+        <div className="absolute -top-2 -left-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+          <Check className="w-3 h-3 text-white" />
+        </div>
+      )}
+
+      <div className="flex items-center justify-between p-4 pb-0">
+        <h3 className={cn(
+          "font-medium",
+          counter.isDone ? "text-green-700 line-through" : "text-slate-900"
+        )}>{counter.name}</h3>
         <div className="flex items-center space-x-2">
           {isLinked && (
             <span className="text-xs text-accent bg-accent/10 px-2 py-1 rounded-full">
@@ -105,6 +119,10 @@ export function Counter({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={onToggleDone}>
+                <CheckCircle2 className="h-4 w-4 mr-2" />
+                Mark as {counter.isDone ? "Not Done" : "Done"}
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={onEdit}>
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
@@ -142,10 +160,24 @@ export function Counter({
               </AlertDialog>
             </DropdownMenuContent>
           </DropdownMenu>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 w-6 p-0"
+            onClick={onToggleCollapse}
+          >
+            {counter.isCollapsed ? (
+              <ChevronDown className="h-3 w-3" />
+            ) : (
+              <ChevronUp className="h-3 w-3" />
+            )}
+          </Button>
         </div>
       </div>
 
-      <div className="flex items-center justify-between">
+      {!counter.isCollapsed && (
+        <div className="p-4 pt-3">
+          <div className="flex items-center justify-between">
         <Button
           variant="outline"
           size="icon"
@@ -193,20 +225,38 @@ export function Counter({
         </Button>
       </div>
 
-      {!isManuallyDisabled ? (
-        <div className="mt-3 flex justify-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-xs text-slate-500 hover:text-slate-700 h-auto p-1"
-            onClick={onReset}
-          >
-            <RotateCcw className="h-3 w-3 mr-1" />
-            Reset to {counter.min}
-          </Button>
+          {!isManuallyDisabled ? (
+            <div className="mt-3 flex justify-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs text-slate-500 hover:text-slate-700 h-auto p-1"
+                onClick={onReset}
+              >
+                <RotateCcw className="h-3 w-3 mr-1" />
+                Reset to {counter.min}
+              </Button>
+            </div>
+          ) : (
+            <div className="mt-3 h-8"></div>
+          )}
         </div>
-      ) : (
-        <div className="mt-3 h-8"></div>
+      )}
+
+      {counter.isCollapsed && (
+        <div className="px-4 pb-4 pt-2">
+          <div className="flex items-center justify-between">
+            <span className={cn(
+              "text-sm",
+              counter.isDone ? "text-green-600" : "text-slate-600"
+            )}>
+              {counter.isDone ? "Completed" : `Current: ${counter.value}`}
+            </span>
+            {counter.isDone && (
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

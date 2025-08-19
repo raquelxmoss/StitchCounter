@@ -10,6 +10,8 @@ export const counterSchema = z.object({
   linkedToCounterId: z.string().optional(),
   triggerValue: z.number().optional(),
   isManuallyDisabled: z.boolean().default(false),
+  isCollapsed: z.boolean().default(false),
+  isDone: z.boolean().default(false),
 });
 
 export const projectSchema = z.object({
